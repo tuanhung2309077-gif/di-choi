@@ -124,6 +124,7 @@ textarea{width:100%;height:210px;font:inherit;color:var(--ink);background:var(--
       <button class="main" id="copy">Sao chép 📋</button>
       <button id="share" hidden>Chia sẻ 📤</button>
     </div>
+    <p class="hint" id="smsg"></p>
     <p class="hint" id="cmsg"></p>
     <div class="nav" style="margin-top:6px"><button class="ghost" data-go="2">← Quay lại</button></div>
   </section>
@@ -230,13 +231,20 @@ $('next').onclick=function(){view.setMonth(view.getMonth()+1);cal()};
 cal();picked();
 
 /* ---------- Bước 4: tổng kết ---------- */
+var FORM='https://formspree.io/f/xzezzyll',sent='';
 function summary(){
-  var L=['Mình là '+name+' nè! 💌','Mình đồng ý đi chơi với bạn! 💖',''];
+  var L=['Mình là '+name+' nè! 💌','Mình đồng ý đi chơi với bạn! 💖',''],D={_subject:'💌 '+name+' đã trả lời lời mời đi chơi!','Tên':name};
   [['food','Món ăn'],['drink','Thức uống'],['walk','Đi dạo'],['other','Ý tưởng khác']].forEach(function(g){
-    var a=Array.from(picks[g[0]]);if(a.length)L.push(g[1]+': '+a.join(', '))});
-  L.push('Ngày rảnh: '+Array.from(sel).sort().map(fmt).join(', '));
-  if($('tm').value)L.push('Giờ hẹn: '+$('tm').value);
-  $('out').value=L.join('\n')}
+    var a=Array.from(picks[g[0]]);if(a.length){L.push(g[1]+': '+a.join(', '));D[g[1]]=a.join(', ')}});
+  var days=Array.from(sel).sort().map(fmt).join(', ');L.push('Ngày rảnh: '+days);D['Ngày rảnh']=days;
+  if($('tm').value){L.push('Giờ hẹn: '+$('tm').value);D['Giờ hẹn']=$('tm').value}
+  $('out').value=L.join('\n');D['Tin nhắn']=$('out').value;send(D)}
+function send(D){
+  var key=JSON.stringify(D),m=$('smsg');if(key===sent)return;
+  m.textContent='Đang gửi cho tớ...';
+  fetch(FORM,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:key})
+    .then(function(r){if(!r.ok)throw 0;sent=key;m.textContent='Tớ nhận được rồi nè, cảm ơn bạn nhiều! 💖'})
+    .catch(function(){m.textContent='Chưa gửi tự động được, bạn bấm Sao chép rồi nhắn cho tớ nhé 💌'})}
 $('copy').onclick=function(){var t=$('out');t.select();var ok=false;
   try{if(navigator.clipboard){navigator.clipboard.writeText(t.value);ok=true}else ok=document.execCommand('copy')}catch(e){try{ok=document.execCommand('copy')}catch(_){}}
   $('cmsg').textContent=ok?'Đã sao chép! Gửi cho tớ nha 💌':'Bạn hãy giữ vào khung trên để sao chép nhé 💌'};
