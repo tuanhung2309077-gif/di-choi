@@ -7,5 +7,5 @@
 //   {n:'🎶 Tên bài', f:'music/ten-file.mp3'},
 //
 // Dòng nào bắt đầu bằng // là ghi chú, web sẽ bỏ qua.
-window.SONGS=[
+window.SONGS=[ {n:'🎶 Nếu như ta chẳng còn', y:'https://youtu.be/rYWLIJB214Q?si=OGMg8GyRfgko-jOu'},
 ];
