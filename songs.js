@@ -8,4 +8,7 @@
 //
 // Dòng nào bắt đầu bằng // là ghi chú, web sẽ bỏ qua.
 window.SONGS=[ {n:'🎶 Nếu như ta chẳng còn', y:'https://youtu.be/rYWLIJB214Q?si=OGMg8GyRfgko-jOu'},
+               {n:'🎶 CORTIS (코르티스) 'FaSHioN'',y:'https://youtu.be/42wfEs7oIP8?si=rHoV9bw0qs4jnFmQ'},
+               {n:'🎶 CORTIS (코르티스) 'REDRED' , y:'https://youtu.be/U6BDbXIah-Y?si=WutNtiexi5ZowBuZ'},
+                 
 ];
