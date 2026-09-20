@@ -74,7 +74,7 @@ textarea{width:100%;height:210px;font:inherit;color:var(--ink);background:var(--
 @keyframes appear{from{opacity:0;transform:scale(.3) rotate(-8deg)}}
 #lines{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
 #lines svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.ph{position:absolute;left:0;top:0;width:0;height:0;offset-rotate:0deg;animation:belt linear infinite}
+.ph{position:absolute;left:0;top:0;width:0;height:0;will-change:transform}
 @keyframes belt{from{offset-distance:0%}to{offset-distance:100%}}
 .sw{position:absolute;left:0;top:0;transform-origin:0 0;animation:sway 3.2s ease-in-out infinite alternate}
 @keyframes sway{from{rotate:-5deg}to{rotate:5deg}}
@@ -343,14 +343,19 @@ function start(){var w=$('who');name=w.value.trim();
   $('intro').hidden=true;strings();lines.hidden=false;$('hi').textContent='Chào '+name+'! 👋';$('app').hidden=false;go(0)}
 $('whoBtn').onclick=start;$('who').onkeydown=function(e){if(e.key==='Enter')start()};
 /* ---------- Dây ảnh chạy như băng chuyền ---------- */
-var lines=$('lines'),lw=innerWidth;
+var lines=$('lines'),lw=innerWidth,beltG=0;
 function strings(){
   var mob=W<700,side=(W-560)/2,pw=mob?44:Math.max(44,Math.min(96,side-26)),ph=pw*4/3,x0=mob?30:Math.min(120,side/2),A=mob?7:16,S=150,n=Math.ceil((H+240)/S),dur=n*S/26,html='';
   [[0,x0],[1,W-x0]].forEach(function(q){
     var x=q[1],d='M'+x+' -120';for(var i=0;i<n;i++)d+=' Q'+(x+(i%2?-2*A:2*A))+' '+(-120+i*S+S/2)+' '+x+' '+(-120+(i+1)*S);
     html+='<svg><path d="'+d+'" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" style="filter:drop-shadow(0 1px 2px rgba(150,90,200,.45))"/></svg>';
-    for(var j=0;j<5;j++)html+='<div class="ph" style="offset-path:path(\''+d+'\');animation-duration:'+dur+'s;animation-delay:-'+(j*dur/5)+'s;animation-direction:'+(q[0]?'reverse':'normal')+'"><div class="sw" style="animation-delay:-'+(Math.random()*3).toFixed(1)+'s"><i></i><img src="'+PH[(j*2+q[0])%PH.length]+'" alt="" style="width:'+pw+'px;height:'+ph+'px;margin-left:-'+pw/2+'px"></div></div>'});
-  lines.innerHTML=html}
+    for(var j=0;j<5;j++)html+='<div class="ph" data-s="'+q[0]+'" data-u="'+j/5+'"><div class="sw" style="animation-delay:-'+(Math.random()*3).toFixed(1)+'s"><i></i><img src="'+PH[(j*2+q[0])%PH.length]+'" alt="" style="width:'+pw+'px;height:'+ph+'px;margin-left:-'+pw/2+'px"></div></div>'});
+  lines.innerHTML=html;
+  var g=++beltG,P=lines.querySelectorAll('path'),t0=performance.now(),
+  it=[].map.call(lines.querySelectorAll('.ph'),function(e){var q=+e.dataset.s,p=P[q];return{e:e,p:p,l:p.getTotalLength(),u:+e.dataset.u,d:q?-1:1}});
+  (function f(){if(g!==beltG)return;var t=performance.now()-t0;
+    it.forEach(function(o){var u=((o.u+o.d*t*.026/o.l)%1+1)%1,pt=o.p.getPointAtLength(u*o.l);o.e.style.transform='translate('+pt.x+'px,'+pt.y+'px)'});
+    if(!reduce)requestAnimationFrame(f)})()}
 addEventListener('resize',function(){if(!lines.hidden&&Math.abs(innerWidth-lw)>30){lw=innerWidth;strings()}});
 
 /* ---------- Hai pháo bắn ruy băng ---------- */
@@ -382,45 +387,55 @@ var SY=[
  {n:'🌙 Lofi nhẹ nhàng',bpm:76,st:'pad',b:[['C3','E5 - G5 - - E5 D5 -'],['A2','C5 - E5 - - D5 C5 -'],['D3','D5 - F5 - - A5 G5 -'],['G2','B4 - D5 - - G5 F5 -']],c:[['C4','E4','G4','B4'],['A3','C4','E4','G4'],['D4','F4','A4','C5'],['G3','B3','D4','F4']]},
  {n:'🎈 Vui vẻ',bpm:120,st:'fun',b:[['C3','E5 - G5 A5 G5 - E5 D5'],['G2','D5 - G5 B5 A5 - G5 D5'],['A2','C5 - E5 A5 G5 - E5 C5'],['F2','F5 - A5 C6 A5 - G5 F5']],c:[['C4','E4','G4'],['B3','D4','G4'],['A3','C4','E4'],['F3','A3','C4']]}
 ];
-var LIST=SY.concat(FILES),AC,bus,tm=0,stp=0,nx=0,cur=-1,on=false,au=new Audio();au.loop=true;
+var LIST=SY.concat(FILES),AC,bus,tm=0,stp=0,nx=0,ci=-1,on=false,au=new Audio();au.loop=true;
 var yp,ytReady=false,ytPend=null;
 function yid(u){var m=/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/.exec(u);return m?m[1]:u}
 function msg(t){$('m1').textContent=t;$('m2').textContent=t}
-if(LIST.some(function(t){return t.y})){
+function initYT(){if(window.ytOn||!LIST.some(function(t){return t.y}))return;window.ytOn=1;
   window.onYouTubeIframeAPIReady=function(){yp=new window.YT.Player('ytp',{height:'200',width:'200',playerVars:{playsinline:1},events:{
     onReady:function(){ytReady=true;if(ytPend!==null){var i=ytPend;ytPend=null;playT(i)}},
     onError:function(){on=false;ui();msg('Bài này không cho phát nhúng, bạn chọn bản khác nhé 🥲')},
     onStateChange:function(e){if(e.data===0&&on){yp.seekTo(0);yp.playVideo()}}}})};
   var sc=document.createElement('script');sc.src='https://www.youtube.com/iframe_api';document.head.appendChild(sc)}
+initYT();
 function actx(){if(!AC){AC=new(window.AudioContext||window.webkitAudioContext)();var m=AC.createGain(),d=AC.createDelay(),f=AC.createGain();
   m.gain.value=.55;d.delayTime.value=.33;f.gain.value=.3;bus=AC.createGain();bus.connect(m);bus.connect(d);d.connect(f);f.connect(d);d.connect(m);m.connect(AC.destination)}
   if(AC.state==='suspended')AC.resume()}
 function nt(f,t,d,ty,g){var o=AC.createOscillator(),v=AC.createGain();o.type=ty;o.frequency.value=f;
   v.gain.setValueAtTime(0,t);v.gain.linearRampToValueAtTime(g,t+.012);v.gain.exponentialRampToValueAtTime(.0001,t+d);
   o.connect(v);v.connect(bus);o.start(t);o.stop(t+d+.05)}
-function sched(){var tr=SY[cur];
+function sched(){var tr=SY[ci];
   while(nx<AC.currentTime+.3){var k=(stp>>3)%tr.b.length,bar=tr.b[k],i=stp&7,m=bar[1].split(' ')[i],sd=60/tr.bpm/2,t=nx,pad=tr.st==='pad';
     if(i===0)nt(fq(bar[0]),t,sd*7,'sine',.22);
     if(m!=='-'){if(tr.st==='box'){nt(fq(m),t,1.3,'sine',.16);nt(fq(m)*2,t,.5,'triangle',.04)}else nt(fq(m),t,pad?.9:.35,pad?'sine':'triangle',.13)}
     if(tr.c&&(pad?i===0:(i===0||i===3||i===4||i===6)))tr.c[k].forEach(function(x,j){nt(fq(x),t+j*.012,pad?sd*7:.28,'triangle',pad?.045:.06)});
     nx+=sd;stp++}}
 function stopAll(){clearInterval(tm);au.pause();if(ytReady)yp.pauseVideo();on=false}
-function playT(i){stopAll();cur=i;var t=LIST[i];msg('');
+function playT(i){stopAll();ci=i;var t=LIST[i];msg('');
   if(t.y){if(ytReady){yp.loadVideoById(yid(t.y));yp.setVolume(70)}else ytPend=i}
   else if(t.f){au.src=t.f;au.play().catch(function(){})}
   else{actx();stp=0;nx=AC.currentTime+.1;tm=setInterval(sched,60)}
   on=true;ui()}
-function toggle(){if(cur<0)return;if(on)stopAll();else if(LIST[cur].y&&ytReady){yp.playVideo();on=true}else playT(cur);ui()}
+function toggle(){if(ci<0)return;if(on)stopAll();else if(LIST[ci].y&&ytReady){yp.playVideo();on=true}else playT(ci);ui()}
 function tracks(box){box.innerHTML='';LIST.forEach(function(t,i){var b=document.createElement('button');b.type='button';b.className='chip';b.textContent=t.n;
-  b.setAttribute('aria-pressed',i===cur&&on?'true':'false');b.onclick=function(){playT(i)};box.appendChild(b)})}
+  b.setAttribute('aria-pressed',i===ci&&on?'true':'false');b.onclick=function(){playT(i)};box.appendChild(b)})}
 function ui(){tracks($('tl'));tracks($('dl'));$('disc').classList.toggle('spin',on);$('dpp').textContent=on?'⏸ Tạm dừng':'▶ Phát'}
 function enter(){$('music').hidden=true;$('disc').hidden=false;beginIntro()}
-$('startBtn').onclick=function(){if(cur<0)playT(0);enter()};
-$('noMusic').onclick=function(){stopAll();cur=-1;ui();enter()};
+$('startBtn').onclick=function(){if(ci<0)playT(0);enter()};
+$('noMusic').onclick=function(){stopAll();ci=-1;ui();enter()};
 $('dbtn').onclick=function(){$('dpanel').hidden=!$('dpanel').hidden};
 $('dpp').onclick=toggle;
 document.addEventListener('click',function(e){if(!e.target.closest('#disc'))$('dpanel').hidden=true});
 ui();
+/* Đọc danh sách bài từ songs.txt: mỗi dòng gồm tên bài rồi link */
+fetch('songs.txt?'+Date.now()).then(function(r){return r.ok?r.text():''}).then(function(tx){
+  var a=[];tx.split(/\r?\n/).forEach(function(l){l=l.trim();if(!l||l[0]==='#')return;
+    var m=/(https?:\/\/\S+|music\/\S+)/.exec(l);if(!m)return;
+    var n=l.slice(0,m.index).replace(/[|\-–:,;\s]+$/,'').replace(/^🎶\s*/,'').trim(),u=m[1].replace(/[)"',;]+$/,''),o={n:'🎶 '+(n||'Bài hát')};
+    if(/youtu|^[\w-]{11}$/.test(u))o.y=u;else o.f=u;
+    if(!LIST.some(function(t){return yid(t.y||t.f||'')===yid(u)}))a.push(o)});
+  if(a.length){a.forEach(function(t){LIST.push(t)});ui();initYT()}
+}).catch(function(){});
 })();
 </script>
 </body>

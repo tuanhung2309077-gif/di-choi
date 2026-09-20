@@ -1,0 +1,8 @@
+# Danh sách nhạc nền. Mỗi bài một dòng: gõ tên bài, dấu |, rồi dán link YouTube.
+# Bài mp3 thì thay link bằng đường dẫn, ví dụ: music/ten-file.mp3
+# Dòng nào bắt đầu bằng dấu # là ghi chú, web sẽ bỏ qua.
+# Ví dụ:   Tên bài | https://youtu.be/XXXXXXXXXXX
+
+Nếu như ta chẳng còn | https://youtu.be/rYWLIJB214Q?si=OGMg8GyRfgko-jOu
+CORTIS (코르티스) FaSHioN | https://youtu.be/42wfEs7oIP8?si=rHoV9bw0qs4jnFmQ
+CORTIS (코르티스) REDRED | https://youtu.be/U6BDbXIah-Y?si=WutNtiexi5ZowBuZ
