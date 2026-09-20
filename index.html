@@ -92,8 +92,10 @@ body.bday{--bg:linear-gradient(160deg,#fff0b8,#ffc9de 50%,#c9e4ff);background:ra
 @media (max-width:699px){body{padding:20px 60px}main{padding:22px 14px}.fin{font-size:1.4rem}}
 #bunting{position:fixed;top:0;left:0;width:100%;height:56px;z-index:1;pointer-events:none;filter:drop-shadow(0 2px 2px rgba(150,90,120,.25))}
 #music{position:fixed;inset:0;z-index:3;display:grid;place-items:center;padding:20px;overflow:auto}
-.tlist{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-.tlist .chip{width:100%;text-align:left;font-size:1rem;padding:9px 16px}
+.tlist{display:flex;flex-direction:column;gap:8px;margin-top:12px;max-height:min(36vh,250px);overflow-y:auto;padding:2px 6px 2px 2px;scrollbar-width:thin;scrollbar-color:var(--pink) transparent;text-align:left}
+.tlist::-webkit-scrollbar{width:6px}.tlist::-webkit-scrollbar-thumb{background:var(--pink);border-radius:6px}
+#dl{max-height:210px}
+.tlist .chip{flex:none;width:100%;text-align:left;font-size:.98rem;line-height:1.25;padding:9px 16px;border-radius:18px}
 #disc{position:fixed;top:62px;right:12px;z-index:10}
 #dbtn{width:54px;height:54px;padding:0;border-radius:50%;position:relative;background:radial-gradient(circle,#fff 0 5%,#ff6fa5 6% 25%,transparent 26%),repeating-radial-gradient(circle,#2a2540 0 2px,#15121f 2px 4px);box-shadow:0 4px 12px rgba(80,40,110,.4);animation:spin 3.5s linear infinite;animation-play-state:paused}
 #dbtn::after{content:'';position:absolute;inset:0;border-radius:50%;background:conic-gradient(transparent 0 20%,rgba(255,255,255,.28) 27%,transparent 35% 70%,rgba(255,255,255,.22) 77%,transparent 85%)}
@@ -387,8 +389,8 @@ var SY=[
  {n:'🌙 Lofi nhẹ nhàng',bpm:76,st:'pad',b:[['C3','E5 - G5 - - E5 D5 -'],['A2','C5 - E5 - - D5 C5 -'],['D3','D5 - F5 - - A5 G5 -'],['G2','B4 - D5 - - G5 F5 -']],c:[['C4','E4','G4','B4'],['A3','C4','E4','G4'],['D4','F4','A4','C5'],['G3','B3','D4','F4']]},
  {n:'🎈 Vui vẻ',bpm:120,st:'fun',b:[['C3','E5 - G5 A5 G5 - E5 D5'],['G2','D5 - G5 B5 A5 - G5 D5'],['A2','C5 - E5 A5 G5 - E5 C5'],['F2','F5 - A5 C6 A5 - G5 F5']],c:[['C4','E4','G4'],['B3','D4','G4'],['A3','C4','E4'],['F3','A3','C4']]}
 ];
-var LIST=SY.concat(FILES),AC,bus,tm=0,stp=0,nx=0,ci=-1,on=false,au=new Audio();au.loop=true;
-var yp,ytReady=false,ytPend=null;
+var LIST=FILES.slice(),AC,bus,tm=0,stp=0,nx=0,ci=-1,on=false,au=new Audio();au.loop=true;
+var yp,ytReady=false,ytPend=null,loaded=false;
 function yid(u){var m=/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/.exec(u);return m?m[1]:u}
 function msg(t){$('m1').textContent=t;$('m2').textContent=t}
 function initYT(){if(window.ytOn||!LIST.some(function(t){return t.y}))return;window.ytOn=1;
@@ -417,11 +419,11 @@ function playT(i){stopAll();ci=i;var t=LIST[i];msg('');
   else{actx();stp=0;nx=AC.currentTime+.1;tm=setInterval(sched,60)}
   on=true;ui()}
 function toggle(){if(ci<0)return;if(on)stopAll();else if(LIST[ci].y&&ytReady){yp.playVideo();on=true}else playT(ci);ui()}
-function tracks(box){box.innerHTML='';LIST.forEach(function(t,i){var b=document.createElement('button');b.type='button';b.className='chip';b.textContent=t.n;
+function tracks(box){box.innerHTML='';if(!LIST.length){box.textContent=loaded?'Chưa có bài nào. Bạn bấm "Không dùng nhạc" để vào luôn nhé.':'Đang tải danh sách nhạc…';return}LIST.forEach(function(t,i){var b=document.createElement('button');b.type='button';b.className='chip';b.textContent=t.n;
   b.setAttribute('aria-pressed',i===ci&&on?'true':'false');b.onclick=function(){playT(i)};box.appendChild(b)})}
 function ui(){tracks($('tl'));tracks($('dl'));$('disc').classList.toggle('spin',on);$('dpp').textContent=on?'⏸ Tạm dừng':'▶ Phát'}
 function enter(){$('music').hidden=true;$('disc').hidden=false;beginIntro()}
-$('startBtn').onclick=function(){if(ci<0)playT(0);enter()};
+$('startBtn').onclick=enter;
 $('noMusic').onclick=function(){stopAll();ci=-1;ui();enter()};
 $('dbtn').onclick=function(){$('dpanel').hidden=!$('dpanel').hidden};
 $('dpp').onclick=toggle;
@@ -435,7 +437,7 @@ fetch('songs.txt?'+Date.now()).then(function(r){return r.ok?r.text():''}).then(f
     if(/youtu|^[\w-]{11}$/.test(u))o.y=u;else o.f=u;
     if(!LIST.some(function(t){return yid(t.y||t.f||'')===yid(u)}))a.push(o)});
   if(a.length){a.forEach(function(t){LIST.push(t)});ui();initYT()}
-}).catch(function(){});
+}).catch(function(){}).then(function(){loaded=true;ui()});
 })();
 </script>
 </body>

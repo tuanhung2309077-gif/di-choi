@@ -1,8 +1,21 @@
 # Danh sách nhạc nền. Mỗi bài một dòng: gõ tên bài, dấu |, rồi dán link YouTube.
 # Bài mp3 thì thay link bằng đường dẫn, ví dụ: music/ten-file.mp3
 # Dòng nào bắt đầu bằng dấu # là ghi chú, web sẽ bỏ qua.
-# Ví dụ:   Tên bài | https://youtu.be/XXXXXXXXXXX
 
-Nếu như ta chẳng còn | https://youtu.be/rYWLIJB214Q?si=OGMg8GyRfgko-jOu
-CORTIS (코르티스) FaSHioN | https://youtu.be/42wfEs7oIP8?si=rHoV9bw0qs4jnFmQ
-CORTIS (코르티스) REDRED | https://youtu.be/U6BDbXIah-Y?si=WutNtiexi5ZowBuZ
+CORTIS 코르티스 'REDRED' Official Audio | https://youtu.be/tSSI7ntBKIs?si=MPvw15KsBSY8g6z4
+Malcolm Todd - Earrings | https://youtu.be/cEE1gFOvUlM?si=MZXQkfFEkd2Wn1vp
+Joji - Normal People (ft. rei brown) | https://youtu.be/4N4P-Y0DyXs?si=yAGG3Ehxq6gIOoJc
+Lil Liem - uocgicoaynoiyeutoi | https://youtu.be/TkMBSbnj8hY
+Lil Liem - uocgianhaynoiyeutoi | https://youtu.be/SKGD-7ytlWw?si=k4qNJjjA2mEP-GvG
+dự báo thời tiết hôm nay mưa | https://youtu.be/i7ZyZHIY2Jw?si=8-0x1Omsgh-xjLwT
+CORTIS (코르티스) 'MONEYMONEYMONEY' | https://youtu.be/5Tll39-VREI?si=dfw_8VkpgzxOAVLm
+Một Cái Ôm - MCK | https://youtu.be/CjTluRiG5uk?si=kgFAQB-K1KD4R0tZ
+Mai Về | https://youtu.be/u49g9gp68GU?si=u6XAcHakSMQSdra0
+Post Malone - Sunflower | https://youtu.be/Dghmoi7XZmc?si=yjQhiDe-J8qDx1rQ
+Djo - End Of Beginning (Official Audio) | https://youtu.be/xy3AcmW0lrQ?si=tp30F7EUmQ5phqoG
+sombr - back to friends (official video) | https://youtu.be/c8zq4kAn_O0?si=WhNacD0TcdR14F9B
+Billie Eilish - BIRDS OF A FEATHER | https://youtu.be/d5gf9dXbPi0?si=SXEUocC9ewL7nvGD
+
+# Các bài cũ của bạn, bỏ dấu # ở đầu dòng nếu muốn dùng lại:
+# Nếu như ta chẳng còn | https://youtu.be/rYWLIJB214Q?si=OGMg8GyRfgko-jOu
+# CORTIS (코르티스) FaSHioN | https://youtu.be/42wfEs7oIP8?si=rHoV9bw0qs4jnFmQ
