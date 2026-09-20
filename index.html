@@ -91,12 +91,31 @@ body.bday{--bg:linear-gradient(160deg,#fff0b8,#ffc9de 50%,#c9e4ff);background:ra
 @keyframes kick{40%{translate:0 -10px;rotate:-8deg}}
 @media (max-width:699px){body{padding:20px 60px}main{padding:22px 14px}.fin{font-size:1.4rem}}
 #bunting{position:fixed;top:0;left:0;width:100%;height:56px;z-index:1;pointer-events:none;filter:drop-shadow(0 2px 2px rgba(150,90,120,.25))}
+#music{position:fixed;inset:0;z-index:3;display:grid;place-items:center;padding:20px;overflow:auto}
+.tlist{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.tlist .chip{width:100%;text-align:left;font-size:1rem;padding:9px 16px}
+#disc{position:fixed;top:62px;right:12px;z-index:10}
+#dbtn{width:54px;height:54px;padding:0;border-radius:50%;position:relative;background:radial-gradient(circle,#fff 0 5%,#ff6fa5 6% 25%,transparent 26%),repeating-radial-gradient(circle,#2a2540 0 2px,#15121f 2px 4px);box-shadow:0 4px 12px rgba(80,40,110,.4);animation:spin 3.5s linear infinite;animation-play-state:paused}
+#dbtn::after{content:'';position:absolute;inset:0;border-radius:50%;background:conic-gradient(transparent 0 20%,rgba(255,255,255,.28) 27%,transparent 35% 70%,rgba(255,255,255,.22) 77%,transparent 85%)}
+#disc.spin #dbtn{animation-play-state:running}
+@keyframes spin{to{transform:rotate(360deg)}}
+#dpanel{position:absolute;right:0;top:64px;width:210px;padding:12px;border-radius:20px;background:var(--card);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 8px 24px rgba(120,70,150,.3)}
+#dpanel .chip{font-size:.92rem}
 </style>
 </head>
 <body class="bday">
 <canvas id="sky" aria-hidden="true"></canvas>
 <svg id="bunting" aria-hidden="true"><defs><pattern id="fl" width="140" height="56" patternUnits="userSpaceOnUse"><path d="M0 4Q70 20 140 4" fill="none" stroke="#fff" stroke-width="2"/><path d="M6 6L36 10L21 38Z" fill="#ff8fb8"/><path d="M40 11L70 13L55 41Z" fill="#ffc94d"/><path d="M74 12L104 11L89 39Z" fill="#7fd8c0"/><path d="M108 10L138 5L123 33Z" fill="#a78bfa"/></pattern></defs><rect width="100%" height="56" fill="url(#fl)"/></svg>
-<section id="intro">
+<div id="ytw" style="position:fixed;left:-9999px;top:0;width:200px;height:200px" aria-hidden="true"><div id="ytp"></div></div>
+<div id="disc" hidden><button id="dbtn" aria-label="Nhạc nền"></button><div id="dpanel" hidden><div id="dl" class="tlist"></div><p class="hint" id="m2" style="font-size:.85rem"></p><button class="chip" id="dpp" style="margin-top:8px;width:100%">⏸ Tạm dừng</button></div></div>
+<section id="music">
+  <div class="letter appear"><div class="mascot" style="font-size:3.4rem">🎧</div><h2>Chọn nhạc nền nhé 🎵</h2><p style="margin:.2em 0">Bấm vào bài để nghe thử, rồi bấm Bắt đầu.</p>
+    <div id="tl" class="tlist"></div>
+    <p class="hint" id="m1"></p>
+    <div style="margin-top:16px"><button class="main" id="startBtn">Bắt đầu ✨</button></div>
+    <button class="ghost" id="noMusic" style="margin-top:6px">Không dùng nhạc</button></div>
+</section>
+<section id="intro" hidden>
   <div id="bloom"></div>
   <div class="letter" id="letter" hidden>
     <div id="lc"><div class="mascot" style="font-size:4.5rem">💌</div><h2>Có thiệp cho bạn nè!</h2><button class="main" id="openBtn">Mở thiệp</button></div>
@@ -163,6 +182,7 @@ body.bday{--bg:linear-gradient(160deg,#fff0b8,#ffc9de 50%,#c9e4ff);background:ra
   </section>
 </main>
 
+<script src="songs.js"></script>
 <script>
 (function(){
 var $=function(i){return document.getElementById(i)};
@@ -310,12 +330,12 @@ function fly(){core.style.opacity=0;
     t=function(x,y,ry,rz,z){return'translate('+x+'px,'+y+'px) '+b+' rotateY('+ry+'deg) rotate('+rz+'deg) scale('+z+')'};
     p.animate([{transform:t(0,0,0,0,1),opacity:1},{transform:t(dx*.3+sw,dy*.3,160,40,1),offset:.35},{transform:t(dx*.7-sw,dy*.7,330,-30,.9),opacity:.9,offset:.7},{transform:t(dx,dy,540,60,.7),opacity:0}],
       {duration:2800+Math.random()*1400,delay:Math.random()*500,easing:'ease-in-out',fill:'forwards'})})}
-if(reduce){L.hidden=false;B.hidden=true}else{
+function beginIntro(){$('intro').hidden=false;if(reduce){L.hidden=false;B.hidden=true}else{
   var kz=Math.min(1.1,innerWidth/440);
   setTimeout(function(){B.style.transform='scale('+kz+')'},300);
   setTimeout(function(){petals.forEach(function(p){p.style.transition='transform 1.7s cubic-bezier(.2,1.25,.4,1) '+p._d+'s';p.style.transform='rotate('+p._a+'deg) translateY(-'+p._o+'px) scale(1)'})},1900);
   setTimeout(fly,4700);
-  setTimeout(function(){L.hidden=false;L.classList.add('appear')},5400)}
+  setTimeout(function(){L.hidden=false;L.classList.add('appear')},5400)}}
 $('openBtn').onclick=function(){L.classList.remove('appear');L.classList.add('flip');
   setTimeout(function(){$('lc').hidden=true;$('ask').hidden=false;$('who').focus()},300)};
 function start(){var w=$('who');name=w.value.trim();
@@ -353,6 +373,54 @@ function fire(){
       ps.push({x:q[1],y:oy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,c:COL[i%7],st:i%4===0,h:[],r:Math.random()*6,w:(Math.random()-.5)*.4,l:0,life:110+Math.random()*90})}});
   if(!run){run=true;tick()}}
 $('pl').onclick=$('pr').onclick=fire;
+
+/* ---------- Nhạc nền ---------- */
+var FILES=window.SONGS||[],N={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+function fq(s){var m=/^([A-G])(#?)(\d)$/.exec(s);return 440*Math.pow(2,((+m[3]+1)*12+N[m[1]]+(m[2]?1:0)-69)/12)}
+var SY=[
+ {n:'🎁 Hộp nhạc',bpm:92,st:'box',b:[['C3','E5 G5 C6 E6 C6 G5 E5 G5'],['G2','D5 G5 B5 D6 B5 G5 D5 G5'],['A2','E5 A5 C6 E6 C6 A5 E5 A5'],['F2','F5 A5 C6 F6 C6 A5 G5 E5']]},
+ {n:'🌙 Lofi nhẹ nhàng',bpm:76,st:'pad',b:[['C3','E5 - G5 - - E5 D5 -'],['A2','C5 - E5 - - D5 C5 -'],['D3','D5 - F5 - - A5 G5 -'],['G2','B4 - D5 - - G5 F5 -']],c:[['C4','E4','G4','B4'],['A3','C4','E4','G4'],['D4','F4','A4','C5'],['G3','B3','D4','F4']]},
+ {n:'🎈 Vui vẻ',bpm:120,st:'fun',b:[['C3','E5 - G5 A5 G5 - E5 D5'],['G2','D5 - G5 B5 A5 - G5 D5'],['A2','C5 - E5 A5 G5 - E5 C5'],['F2','F5 - A5 C6 A5 - G5 F5']],c:[['C4','E4','G4'],['B3','D4','G4'],['A3','C4','E4'],['F3','A3','C4']]}
+];
+var LIST=SY.concat(FILES),AC,bus,tm=0,stp=0,nx=0,cur=-1,on=false,au=new Audio();au.loop=true;
+var yp,ytReady=false,ytPend=null;
+function yid(u){var m=/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/.exec(u);return m?m[1]:u}
+function msg(t){$('m1').textContent=t;$('m2').textContent=t}
+if(LIST.some(function(t){return t.y})){
+  window.onYouTubeIframeAPIReady=function(){yp=new window.YT.Player('ytp',{height:'200',width:'200',playerVars:{playsinline:1},events:{
+    onReady:function(){ytReady=true;if(ytPend!==null){var i=ytPend;ytPend=null;playT(i)}},
+    onError:function(){on=false;ui();msg('Bài này không cho phát nhúng, bạn chọn bản khác nhé 🥲')},
+    onStateChange:function(e){if(e.data===0&&on){yp.seekTo(0);yp.playVideo()}}}})};
+  var sc=document.createElement('script');sc.src='https://www.youtube.com/iframe_api';document.head.appendChild(sc)}
+function actx(){if(!AC){AC=new(window.AudioContext||window.webkitAudioContext)();var m=AC.createGain(),d=AC.createDelay(),f=AC.createGain();
+  m.gain.value=.55;d.delayTime.value=.33;f.gain.value=.3;bus=AC.createGain();bus.connect(m);bus.connect(d);d.connect(f);f.connect(d);d.connect(m);m.connect(AC.destination)}
+  if(AC.state==='suspended')AC.resume()}
+function nt(f,t,d,ty,g){var o=AC.createOscillator(),v=AC.createGain();o.type=ty;o.frequency.value=f;
+  v.gain.setValueAtTime(0,t);v.gain.linearRampToValueAtTime(g,t+.012);v.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(v);v.connect(bus);o.start(t);o.stop(t+d+.05)}
+function sched(){var tr=SY[cur];
+  while(nx<AC.currentTime+.3){var k=(stp>>3)%tr.b.length,bar=tr.b[k],i=stp&7,m=bar[1].split(' ')[i],sd=60/tr.bpm/2,t=nx,pad=tr.st==='pad';
+    if(i===0)nt(fq(bar[0]),t,sd*7,'sine',.22);
+    if(m!=='-'){if(tr.st==='box'){nt(fq(m),t,1.3,'sine',.16);nt(fq(m)*2,t,.5,'triangle',.04)}else nt(fq(m),t,pad?.9:.35,pad?'sine':'triangle',.13)}
+    if(tr.c&&(pad?i===0:(i===0||i===3||i===4||i===6)))tr.c[k].forEach(function(x,j){nt(fq(x),t+j*.012,pad?sd*7:.28,'triangle',pad?.045:.06)});
+    nx+=sd;stp++}}
+function stopAll(){clearInterval(tm);au.pause();if(ytReady)yp.pauseVideo();on=false}
+function playT(i){stopAll();cur=i;var t=LIST[i];msg('');
+  if(t.y){if(ytReady){yp.loadVideoById(yid(t.y));yp.setVolume(70)}else ytPend=i}
+  else if(t.f){au.src=t.f;au.play().catch(function(){})}
+  else{actx();stp=0;nx=AC.currentTime+.1;tm=setInterval(sched,60)}
+  on=true;ui()}
+function toggle(){if(cur<0)return;if(on)stopAll();else if(LIST[cur].y&&ytReady){yp.playVideo();on=true}else playT(cur);ui()}
+function tracks(box){box.innerHTML='';LIST.forEach(function(t,i){var b=document.createElement('button');b.type='button';b.className='chip';b.textContent=t.n;
+  b.setAttribute('aria-pressed',i===cur&&on?'true':'false');b.onclick=function(){playT(i)};box.appendChild(b)})}
+function ui(){tracks($('tl'));tracks($('dl'));$('disc').classList.toggle('spin',on);$('dpp').textContent=on?'⏸ Tạm dừng':'▶ Phát'}
+function enter(){$('music').hidden=true;$('disc').hidden=false;beginIntro()}
+$('startBtn').onclick=function(){if(cur<0)playT(0);enter()};
+$('noMusic').onclick=function(){stopAll();cur=-1;ui();enter()};
+$('dbtn').onclick=function(){$('dpanel').hidden=!$('dpanel').hidden};
+$('dpp').onclick=toggle;
+document.addEventListener('click',function(e){if(!e.target.closest('#disc'))$('dpanel').hidden=true});
+ui();
 })();
 </script>
 </body>
